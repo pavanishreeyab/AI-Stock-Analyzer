@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Stock Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📈 Stock Analyzer</h1>
+            <p>AI-powered insights on your favorite stocks</p>
+        </div>
+
+        <!-- Input Section -->
+        <div class="input-section">
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    id="ticker-input" 
+                    placeholder="Enter Stock Ticker (e.g., AAPL)"
+                    autocomplete="off"
+                />
+            </div>
+            <button class="analyze-btn" id="analyze-btn" onclick="analyzeStock()">Analyze</button>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-container hidden" id="loading-container">
+            <div class="spinner"></div>
+            <div class="loading-text">Fetching stock data...</div>
+        </div>
+
+        <!-- Output Card -->
+        <div class="output-card hidden" id="output-card">
+            <div class="stock-header">
+                <div>
+                    <div class="stock-name" id="stock-name">Apple Inc.</div>
+                    <div class="stock-ticker" id="stock-ticker">AAPL</div>
+                </div>
+                <div class="price-container">
+                    <div class="price" id="stock-price">$192.50</div>
+                    <div class="change positive" id="stock-change">+2.45%</div>
+                </div>
+            </div>
+
+            <div class="ai-summary-section">
+                <label class="ai-label">🤖 AI-Generated Summary</label>
+                <div class="ai-summary" id="ai-summary">
+                    Apple shows stable upward trend with positive investor sentiment.
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">Market Cap</div>
+                    <div class="stat-value" id="market-cap">$2.8T</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">52-Week High</div>
+                    <div class="stat-value" id="week-high">$199.87</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        Powered by <a href="#">AI Stock Analyzer</a>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
