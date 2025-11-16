@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Stock Analyzer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <title>Stock Analyzer - AI-Powered Stock Insights</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -44,7 +44,6 @@
             overflow-x: hidden;
         }
 
-        /* Background gradient animation */
         body::before {
             content: '';
             position: fixed;
@@ -68,7 +67,7 @@
             position: relative;
             z-index: 1;
             width: 100%;
-            max-width: 600px;
+            max-width: 700px;
             display: flex;
             flex-direction: column;
             gap: 40px;
@@ -86,7 +85,6 @@
             }
         }
 
-        /* Header */
         .header {
             text-align: center;
             margin-bottom: 20px;
@@ -94,39 +92,41 @@
 
         .header h1 {
             font-family: 'Poppins', sans-serif;
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-blue) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            letter-spacing: -0.5px;
         }
 
         .header p {
-            font-size: 0.95rem;
+            font-size: 1rem;
             color: var(--text-muted);
             font-weight: 300;
+            letter-spacing: 0.5px;
         }
 
-        /* Input Section */
         .input-section {
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
+            justify-content: center;
         }
 
         .input-wrapper {
             flex: 1;
-            min-width: 200px;
+            min-width: 250px;
             position: relative;
         }
 
         #ticker-input {
             width: 100%;
-            padding: 14px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
+            padding: 16px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
             background-color: var(--secondary-dark);
             color: var(--text-light);
             font-size: 1rem;
@@ -134,10 +134,14 @@
             font-weight: 400;
             transition: all 0.3s ease;
             outline: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         #ticker-input::placeholder {
             color: var(--text-muted);
+            text-transform: none;
+            letter-spacing: 0;
         }
 
         #ticker-input:focus {
@@ -150,14 +154,13 @@
             border-color: var(--accent-blue);
         }
 
-        /* Button */
         .analyze-btn {
-            padding: 14px 32px;
+            padding: 16px 40px;
             background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-blue) 100%);
             color: var(--primary-dark);
             border: none;
-            border-radius: 10px;
-            font-size: 1rem;
+            border-radius: 12px;
+            font-size: 1.05rem;
             font-family: 'Poppins', sans-serif;
             font-weight: 600;
             cursor: pointer;
@@ -166,6 +169,7 @@
             box-shadow: 0 4px 15px rgba(6, 214, 160, 0.3);
             position: relative;
             overflow: hidden;
+            letter-spacing: 0.5px;
         }
 
         .analyze-btn::before {
@@ -177,6 +181,7 @@
             height: 100%;
             background: rgba(255, 255, 255, 0.2);
             transition: left 0.5s ease;
+            z-index: 0;
         }
 
         .analyze-btn:hover::before {
@@ -185,7 +190,7 @@
 
         .analyze-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(6, 214, 160, 0.4);
+            box-shadow: 0 6px 25px rgba(6, 214, 160, 0.4);
         }
 
         .analyze-btn:active {
@@ -198,7 +203,6 @@
             transform: none;
         }
 
-        /* Loading Spinner */
         .spinner {
             width: 50px;
             height: 50px;
@@ -220,63 +224,78 @@
             gap: 20px;
             padding: 60px 20px;
             text-align: center;
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .loading-container.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
         }
 
         .loading-text {
             font-size: 1.1rem;
             color: var(--text-muted);
             font-weight: 500;
+            letter-spacing: 0.3px;
         }
 
-        /* Output Card */
         .output-card {
-            background: rgba(26, 31, 46, 0.6);
+            background: rgba(26, 31, 46, 0.7);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 32px;
-            animation: slideUp 0.5s ease-out;
+            padding: 40px;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: all 0.5s ease;
             backdrop-filter: blur(10px);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .output-card.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
         }
 
         .output-card:hover {
             border-color: var(--accent-teal);
             box-shadow: 0 12px 40px rgba(6, 214, 160, 0.15);
-            transition: all 0.3s ease;
         }
 
-        /* Stock Info */
         .stock-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
             border-bottom: 1px solid var(--border-color);
+            gap: 20px;
+        }
+
+        .stock-info {
+            text-align: left;
         }
 
         .stock-name {
             font-family: 'Poppins', sans-serif;
-            font-size: 1.8rem;
+            font-size: 1.9rem;
             font-weight: 700;
             color: var(--text-light);
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
         }
 
         .stock-ticker {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--text-muted);
-            margin-top: 4px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .price-container {
@@ -284,20 +303,22 @@
         }
 
         .price {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 700;
             color: var(--text-light);
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: -1px;
         }
 
         .change {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             font-weight: 600;
-            margin-top: 6px;
-            padding: 4px 12px;
-            border-radius: 6px;
+            margin-top: 8px;
+            padding: 6px 14px;
+            border-radius: 8px;
             display: inline-block;
-            width: fit-content;
-            margin-left: auto;
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: 0.3px;
         }
 
         .change.positive {
@@ -310,68 +331,94 @@
             color: var(--danger-red);
         }
 
-        /* AI Summary */
         .ai-summary-section {
-            margin-top: 24px;
+            margin-top: 28px;
         }
 
         .ai-label {
             font-size: 0.85rem;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.8px;
+            letter-spacing: 1px;
             font-weight: 600;
             margin-bottom: 12px;
             display: block;
         }
 
         .ai-summary {
-            font-size: 1rem;
+            font-size: 1.05rem;
             color: var(--text-light);
-            line-height: 1.6;
-            padding: 16px;
-            background: rgba(6, 214, 160, 0.05);
+            line-height: 1.7;
+            padding: 18px;
+            background: rgba(6, 214, 160, 0.08);
             border-left: 3px solid var(--accent-teal);
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: 400;
+            letter-spacing: 0.3px;
         }
 
-        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
-            margin-top: 24px;
+            margin-top: 28px;
         }
 
         .stat-item {
             background: rgba(7, 59, 76, 0.3);
-            padding: 16px;
-            border-radius: 10px;
+            padding: 18px;
+            border-radius: 12px;
             border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            background: rgba(7, 59, 76, 0.5);
+            border-color: var(--accent-teal);
         }
 
         .stat-label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
             margin-bottom: 8px;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .stat-value {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--accent-teal);
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: -0.5px;
         }
 
-        /* Hidden State */
+        .error-message {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--danger-red);
+            color: var(--danger-red);
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 20px;
+            font-size: 1rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .error-message.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+
         .hidden {
             display: none;
         }
 
-        /* Footer */
         .footer {
             position: fixed;
             bottom: 20px;
@@ -379,6 +426,8 @@
             font-size: 0.85rem;
             color: var(--text-muted);
             z-index: 0;
+            font-weight: 300;
+            letter-spacing: 0.3px;
         }
 
         .footer a {
@@ -392,10 +441,9 @@
             color: var(--accent-blue);
         }
 
-        /* Responsive */
-        @media (max-width: 480px) {
+        @media (max-width: 600px) {
             .header h1 {
-                font-size: 2rem;
+                font-size: 2.2rem;
             }
 
             .input-section {
@@ -413,17 +461,19 @@
             .stock-header {
                 flex-direction: column;
                 gap: 12px;
+                align-items: flex-start;
             }
 
             .price-container {
                 text-align: left;
-            }
-
-            .change {
-                margin-left: 0;
+                width: 100%;
             }
 
             .price {
+                font-size: 1.8rem;
+            }
+
+            .stock-name {
                 font-size: 1.6rem;
             }
 
@@ -440,13 +490,11 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
-            <h1>📈 Stock Analyzer</h1>
+            <h1>📊 Stock Analyzer</h1>
             <p>AI-powered insights on your favorite stocks</p>
         </div>
 
-        <!-- Input Section -->
         <div class="input-section">
             <div class="input-wrapper">
                 <input 
@@ -454,97 +502,124 @@
                     id="ticker-input" 
                     placeholder="Enter Stock Ticker (e.g., AAPL)"
                     autocomplete="off"
-                />
+                >
             </div>
-            <button class="analyze-btn" id="analyze-btn" onclick="analyzeStock()">Analyze</button>
+            <button class="analyze-btn" id="analyze-btn">Analyze</button>
         </div>
 
-        <!-- Loading State -->
-        <div class="loading-container hidden" id="loading-container">
+        <div class="loading-container" id="loading-container">
             <div class="spinner"></div>
-            <div class="loading-text">Fetching stock data...</div>
+            <div class="loading-text">Fetching real-time data...</div>
         </div>
 
-        <!-- Output Card -->
-        <div class="output-card hidden" id="output-card">
+        <div class="error-message" id="error-message"></div>
+
+        <div class="output-card" id="output-card">
             <div class="stock-header">
-                <div>
-                    <div class="stock-name" id="stock-name">Apple Inc.</div>
-                    <div class="stock-ticker" id="stock-ticker">AAPL</div>
+                <div class="stock-info">
+                    <div class="stock-name" id="stock-name">—</div>
+                    <div class="stock-ticker" id="stock-ticker">—</div>
                 </div>
                 <div class="price-container">
-                    <div class="price" id="stock-price">$192.50</div>
-                    <div class="change positive" id="stock-change">+2.45%</div>
+                    <div class="price" id="stock-price">$0.00</div>
+                    <div class="change" id="stock-change">+0.00%</div>
                 </div>
             </div>
 
             <div class="ai-summary-section">
-                <label class="ai-label">🤖 AI-Generated Summary</label>
+                <span class="ai-label">🤖 AI-Generated Summary</span>
                 <div class="ai-summary" id="ai-summary">
-                    Apple shows stable upward trend with positive investor sentiment.
+                    Loading analysis...
                 </div>
             </div>
 
             <div class="stats-grid">
                 <div class="stat-item">
                     <div class="stat-label">Market Cap</div>
-                    <div class="stat-value" id="market-cap">$2.8T</div>
+                    <div class="stat-value" id="market-cap">—</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">52-Week High</div>
-                    <div class="stat-value" id="week-high">$199.87</div>
+                    <div class="stat-value" id="week-high">—</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Volume</div>
+                    <div class="stat-value" id="volume">—</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">P/E Ratio</div>
+                    <div class="stat-value" id="pe-ratio">—</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
     <div class="footer">
         Powered by <a href="#">AI Stock Analyzer</a>
     </div>
 
     <script>
-        // Mock stock data database
+        // Mock stock data with AI insights
         const stockDatabase = {
             'AAPL': {
                 name: 'Apple Inc.',
-                price: 192.50,
-                change: 2.45,
-                marketCap: '$2.8T',
-                weekHigh: '$199.87',
-                summary: 'Apple shows stable upward trend with strong ecosystem integration. Positive investor sentiment driven by new product launches and services growth.'
+                price: 228.45,
+                change: 2.34,
+                marketCap: '$3.2T',
+                weekHigh: '$235.67',
+                volume: '52.3M',
+                peRatio: '28.5',
+                insight: 'Apple shows stable upward momentum with strong ecosystem integration. Positive investor sentiment driven by new product launches and services growth. Consider watching support levels at $220.'
             },
             'GOOGL': {
                 name: 'Alphabet Inc.',
-                price: 156.23,
-                change: 1.82,
-                marketCap: '$2.0T',
-                weekHigh: '$165.45',
-                summary: 'Alphabet demonstrates robust cloud growth and AI advancements. AI initiatives gaining traction with market leadership in search and advertising.'
+                price: 154.78,
+                change: -1.23,
+                marketCap: '$2.1T',
+                weekHigh: '$168.90',
+                volume: '28.9M',
+                peRatio: '24.3',
+                insight: 'Alphabet faces near-term volatility but advertising fundamentals remain solid. Watch for AI integration announcements. Recent sell-off presents potential buying opportunity for long-term investors.'
             },
             'MSFT': {
                 name: 'Microsoft Corporation',
-                price: 373.49,
-                change: 3.12,
-                marketCap: '$2.78T',
-                weekHigh: '$378.91',
-                summary: 'Microsoft leverages AI and cloud computing dominance. Strong enterprise partnerships and Azure growth supporting sustained momentum.'
+                price: 391.23,
+                change: 1.87,
+                marketCap: '$2.9T',
+                weekHigh: '$406.75',
+                volume: '18.4M',
+                peRatio: '34.2',
+                insight: 'Microsoft\'s cloud business (Azure) shows exceptional growth trajectory. AI partnerships are game-changing. Strong dividend yield makes this attractive for value-conscious investors.'
             },
             'TSLA': {
                 name: 'Tesla Inc.',
-                price: 278.95,
-                change: -1.23,
-                marketCap: '$880B',
-                weekHigh: '$290.50',
-                summary: 'Tesla navigates competitive EV landscape with innovation focus. Margin pressures offset by long-term growth potential in autonomous vehicles.'
+                price: 242.84,
+                change: -3.45,
+                marketCap: '$770B',
+                weekHigh: '$298.50',
+                volume: '124.5M',
+                peRatio: '65.8',
+                insight: 'Tesla stock shows volatility due to macro factors and competitive pressures. EV adoption trends remain positive. Monitor semi-annual guidance and production capacity announcements closely.'
             },
             'AMZN': {
                 name: 'Amazon.com Inc.',
-                price: 194.85,
-                change: 2.89,
-                marketCap: '$1.9T',
-                weekHigh: '$201.32',
-                summary: 'Amazon demonstrates resilience with AWS cloud dominance. E-commerce competition offset by advertising growth and logistics efficiency.'
+                price: 178.65,
+                change: 0.92,
+                marketCap: '$1.8T',
+                weekHigh: '$189.23',
+                volume: '42.1M',
+                peRatio: '56.7',
+                insight: 'Amazon\'s AWS cloud division remains the profit powerhouse. E-commerce growth stabilizes. Strong support level at $170. Good entry point for patient long-term investors.'
+            },
+            'NVIDIA': {
+                name: 'NVIDIA Corporation',
+                price: 785.93,
+                change: 3.21,
+                marketCap: '$1.95T',
+                weekHigh: '$849.20',
+                volume: '23.7M',
+                peRatio: '68.2',
+                insight: 'NVIDIA dominates AI chip market with strong growth prospects. Geopolitical risks and competition should be monitored. Data center demand continues to drive revenue growth.'
             }
         };
 
@@ -552,68 +627,85 @@
         const analyzeBtn = document.getElementById('analyze-btn');
         const loadingContainer = document.getElementById('loading-container');
         const outputCard = document.getElementById('output-card');
+        const errorMessage = document.getElementById('error-message');
 
-        // Allow Enter key to analyze
+        analyzeBtn.addEventListener('click', handleAnalyze);
         tickerInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                analyzeStock();
-            }
+            if (e.key === 'Enter') handleAnalyze();
         });
 
-        // Clear input focus on load
-        window.addEventListener('load', () => {
-            tickerInput.focus();
-        });
-
-        function analyzeStock() {
-            const ticker = tickerInput.value.toUpperCase().trim();
+        async function handleAnalyze() {
+            const ticker = tickerInput.value.trim().toUpperCase();
 
             if (!ticker) {
-                tickerInput.focus();
+                showError('Please enter a stock ticker');
                 return;
             }
 
-            // Hide output and show loading
-            outputCard.classList.add('hidden');
-            loadingContainer.classList.remove('hidden');
+            if (ticker.length < 1 || ticker.length > 5) {
+                showError('Ticker must be 1-5 characters');
+                return;
+            }
+
+            clearError();
             analyzeBtn.disabled = true;
+            loadingContainer.classList.add('active');
+            outputCard.classList.remove('active');
 
-            // Simulate API delay (2-3 seconds)
-            setTimeout(() => {
-                const stock = stockDatabase[ticker];
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
 
-                if (!stock) {
-                    // Handle invalid ticker
-                    loadingContainer.classList.add('hidden');
+            try {
+                const data = stockDatabase[ticker];
+                
+                if (!data) {
+                    showError(`Stock ticker "${ticker}" not found. Try: AAPL, GOOGL, MSFT, TSLA, AMZN, NVIDIA`);
+                    loadingContainer.classList.remove('active');
                     analyzeBtn.disabled = false;
-                    alert(`Stock ticker "${ticker}" not found. Try: AAPL, GOOGL, MSFT, TSLA, AMZN`);
                     return;
                 }
 
-                // Update output card with stock data
-                displayStockData(stock, ticker);
-
-                // Hide loading and show output
-                loadingContainer.classList.add('hidden');
-                outputCard.classList.remove('hidden');
+                displayResults(data, ticker);
+            } catch (error) {
+                showError('Error fetching stock data. Please try again.');
+            } finally {
                 analyzeBtn.disabled = false;
-            }, 2500);
+                loadingContainer.classList.remove('active');
+            }
         }
 
-        function displayStockData(stock, ticker) {
-            document.getElementById('stock-name').textContent = stock.name;
+        function displayResults(data, ticker) {
+            document.getElementById('stock-name').textContent = data.name;
             document.getElementById('stock-ticker').textContent = ticker;
-            document.getElementById('stock-price').textContent = `$${stock.price.toFixed(2)}`;
+            document.getElementById('stock-price').textContent = `$${data.price.toFixed(2)}`;
 
             const changeElement = document.getElementById('stock-change');
-            changeElement.textContent = (stock.change > 0 ? '+' : '') + stock.change.toFixed(2) + '%';
-            changeElement.classList.remove('positive', 'negative');
-            changeElement.classList.add(stock.change >= 0 ? 'positive' : 'negative');
+            changeElement.textContent = data.change >= 0 
+                ? `+${data.change.toFixed(2)}%`
+                : `${data.change.toFixed(2)}%`;
+            changeElement.className = `change ${data.change >= 0 ? 'positive' : 'negative'}`;
 
-            document.getElementById('ai-summary').textContent = stock.summary;
-            document.getElementById('market-cap').textContent = stock.marketCap;
-            document.getElementById('week-high').textContent = stock.weekHigh;
+            document.getElementById('ai-summary').textContent = data.insight;
+            document.getElementById('market-cap').textContent = data.marketCap;
+            document.getElementById('week-high').textContent = data.weekHigh;
+            document.getElementById('volume').textContent = data.volume;
+            document.getElementById('pe-ratio').textContent = data.peRatio;
+
+            outputCard.classList.add('active');
         }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('active');
+        }
+
+        function clearError() {
+            errorMessage.classList.remove('active');
+            errorMessage.textContent = '';
+        }
+
+        // Set initial focus
+        tickerInput.focus();
     </script>
 </body>
 </html>
