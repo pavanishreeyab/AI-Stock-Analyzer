@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Analysis API</title>
+    <title>AI Stock Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,111 +12,73 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary-dark: #0f1419;
+            --secondary-dark: #1a1f2e;
+            --accent-teal: #06d6a0;
+            --accent-blue: #118ab2;
+            --accent-purple: #073b4c;
+            --text-light: #e8eaed;
+            --text-muted: #9ca3af;
+            --success-green: #10b981;
+            --danger-red: #ef4444;
+            --border-color: #2d3748;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            color: var(--text-light);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            min-height: 100vh;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background gradient animation */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 50%, rgba(6, 214, 160, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(17, 138, 178, 0.1) 0%, transparent 50%);
+            z-index: 0;
+            animation: gradientShift 15s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(50px, 50px); }
         }
 
         .container {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+            width: 100%;
             max-width: 600px;
-            width: 100%;
-            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            animation: fadeIn 0.6s ease-out;
         }
 
-        h1 {
-            color: #333;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 600;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .button-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        button {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .btn-price {
-            background-color: #667eea;
-            color: white;
-        }
-
-        .btn-price:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-analyze {
-            background-color: #764ba2;
-            color: white;
-        }
-
-        .btn-analyze:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
-        }
-
-        .result {
-            background-color: #f8f9fa;
-            border-left: 4px solid #667eea;
-            padding: 20px;
-            border-radius: 5px;
-            display: none;
-            margin-top: 20px;
-        }
-
-        .result.show {
-            display: block;
-            animation: slideIn 0.3s ease-in;
-        }
-
-        @keyframes slideIn {
+        @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(-10px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
@@ -123,177 +86,534 @@
             }
         }
 
-        .result-item {
-            margin-bottom: 12px;
-        }
-
-        .result-label {
-            font-weight: 600;
-            color: #555;
-            display: inline-block;
-            min-width: 100px;
-        }
-
-        .result-value {
-            color: #333;
-        }
-
-        .error {
-            border-left-color: #e74c3c;
-            background-color: #fadbd8;
-        }
-
-        .success {
-            border-left-color: #27ae60;
-            background-color: #d5f4e6;
-        }
-
-        .loading {
+        /* Header */
+        .header {
             text-align: center;
-            color: #667eea;
+            margin-bottom: 20px;
         }
 
+        .header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        /* Input Section */
+        .input-section {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        #ticker-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background-color: var(--secondary-dark);
+            color: var(--text-light);
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        #ticker-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        #ticker-input:focus {
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 0 3px rgba(6, 214, 160, 0.1);
+            background-color: rgba(26, 31, 46, 0.8);
+        }
+
+        #ticker-input:hover {
+            border-color: var(--accent-blue);
+        }
+
+        /* Button */
+        .analyze-btn {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-blue) 100%);
+            color: var(--primary-dark);
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(6, 214, 160, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .analyze-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.5s ease;
+        }
+
+        .analyze-btn:hover::before {
+            left: 100%;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(6, 214, 160, 0.4);
+        }
+
+        .analyze-btn:active {
+            transform: translateY(0);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loading Spinner */
         .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--accent-teal);
+            border-right-color: var(--accent-blue);
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
             animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 10px;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .loading-text {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Output Card */
+        .output-card {
+            background: rgba(26, 31, 46, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            animation: slideUp 0.5s ease-out;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .output-card:hover {
+            border-color: var(--accent-teal);
+            box-shadow: 0 12px 40px rgba(6, 214, 160, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        /* Stock Info */
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stock-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        .stock-ticker {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .price-container {
+            text-align: right;
+        }
+
+        .price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        .change {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 6px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            width: fit-content;
+            margin-left: auto;
+        }
+
+        .change.positive {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: var(--success-green);
+        }
+
+        .change.negative {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: var(--danger-red);
+        }
+
+        /* AI Summary */
+        .ai-summary-section {
+            margin-top: 24px;
+        }
+
+        .ai-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .ai-summary {
+            font-size: 1rem;
+            color: var(--text-light);
+            line-height: 1.6;
+            padding: 16px;
+            background: rgba(6, 214, 160, 0.05);
+            border-left: 3px solid var(--accent-teal);
+            border-radius: 6px;
+            font-weight: 400;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .stat-item {
+            background: rgba(7, 59, 76, 0.3);
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-teal);
+        }
+
+        /* Hidden State */
+        .hidden {
+            display: none;
+        }
+
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            z-index: 0;
+        }
+
+        .footer a {
+            color: var(--accent-teal);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: var(--accent-blue);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .input-section {
+                flex-direction: column;
+            }
+
+            .analyze-btn {
+                width: 100%;
+            }
+
+            .output-card {
+                padding: 24px;
+            }
+
+            .stock-header {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .price-container {
+                text-align: left;
+            }
+
+            .change {
+                margin-left: 0;
+            }
+
+            .price {
+                font-size: 1.6rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer {
+                bottom: 10px;
+                font-size: 0.75rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📈 Stock Analysis</h1>
-        
-        <div class="form-group">
-            <label for="ticker">Stock Ticker Symbol</label>
-            <input type="text" id="ticker" placeholder="e.g., AAPL, GOOGL, MSFT" maxlength="10">
+        <!-- Header -->
+        <div class="header">
+            <h1>📈 Stock Analyzer</h1>
+            <p>AI-powered insights on your favorite stocks</p>
         </div>
 
-        <div class="button-group">
-            <button class="btn-price" onclick="getPrice()">Get Price</button>
-            <button class="btn-analyze" onclick="analyze()">AI Analysis</button>
+        <!-- Input Section -->
+        <div class="input-section">
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    id="ticker-input" 
+                    placeholder="Enter Stock Ticker (e.g., AAPL)"
+                    autocomplete="off"
+                />
+            </div>
+            <button class="analyze-btn" id="analyze-btn" onclick="analyzeStock()">Analyze</button>
         </div>
 
-        <div id="result" class="result"></div>
+        <!-- Loading State -->
+        <div class="loading-container hidden" id="loading-container">
+            <div class="spinner"></div>
+            <div class="loading-text">Fetching stock data...</div>
+        </div>
+
+        <!-- Output Card -->
+        <div class="output-card hidden" id="output-card">
+            <div class="stock-header">
+                <div>
+                    <div class="stock-name" id="stock-name">Apple Inc.</div>
+                    <div class="stock-ticker" id="stock-ticker">AAPL</div>
+                </div>
+                <div class="price-container">
+                    <div class="price" id="stock-price">$192.50</div>
+                    <div class="change positive" id="stock-change">+2.45%</div>
+                </div>
+            </div>
+
+            <div class="ai-summary-section">
+                <label class="ai-label">🤖 AI-Generated Summary</label>
+                <div class="ai-summary" id="ai-summary">
+                    Apple shows stable upward trend with positive investor sentiment.
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">Market Cap</div>
+                    <div class="stat-value" id="market-cap">$2.8T</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">52-Week High</div>
+                    <div class="stat-value" id="week-high">$199.87</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        Powered by <a href="#">AI Stock Analyzer</a>
     </div>
 
     <script>
-        const API_BASE = "http://127.0.0.1:8000";
-
-        async function getPrice() {
-            const ticker = document.getElementById("ticker").value.toUpperCase();
-            if (!ticker) {
-                showError("Please enter a ticker symbol");
-                return;
+        // Mock stock data database
+        const stockDatabase = {
+            'AAPL': {
+                name: 'Apple Inc.',
+                price: 192.50,
+                change: 2.45,
+                marketCap: '$2.8T',
+                weekHigh: '$199.87',
+                summary: 'Apple shows stable upward trend with strong ecosystem integration. Positive investor sentiment driven by new product launches and services growth.'
+            },
+            'GOOGL': {
+                name: 'Alphabet Inc.',
+                price: 156.23,
+                change: 1.82,
+                marketCap: '$2.0T',
+                weekHigh: '$165.45',
+                summary: 'Alphabet demonstrates robust cloud growth and AI advancements. AI initiatives gaining traction with market leadership in search and advertising.'
+            },
+            'MSFT': {
+                name: 'Microsoft Corporation',
+                price: 373.49,
+                change: 3.12,
+                marketCap: '$2.78T',
+                weekHigh: '$378.91',
+                summary: 'Microsoft leverages AI and cloud computing dominance. Strong enterprise partnerships and Azure growth supporting sustained momentum.'
+            },
+            'TSLA': {
+                name: 'Tesla Inc.',
+                price: 278.95,
+                change: -1.23,
+                marketCap: '$880B',
+                weekHigh: '$290.50',
+                summary: 'Tesla navigates competitive EV landscape with innovation focus. Margin pressures offset by long-term growth potential in autonomous vehicles.'
+            },
+            'AMZN': {
+                name: 'Amazon.com Inc.',
+                price: 194.85,
+                change: 2.89,
+                marketCap: '$1.9T',
+                weekHigh: '$201.32',
+                summary: 'Amazon demonstrates resilience with AWS cloud dominance. E-commerce competition offset by advertising growth and logistics efficiency.'
             }
+        };
 
-            showLoading("Fetching price...");
-            try {
-                const response = await fetch(`${API_BASE}/price?ticker=${ticker}`);
-                const data = await response.json();
+        const tickerInput = document.getElementById('ticker-input');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const loadingContainer = document.getElementById('loading-container');
+        const outputCard = document.getElementById('output-card');
 
-                if (!response.ok) {
-                    showError(data.detail || "Error fetching price");
-                    return;
-                }
-
-                showResult(`
-                    <div class="result-item">
-                        <span class="result-label">Ticker:</span>
-                        <span class="result-value">${data.ticker}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">Price:</span>
-                        <span class="result-value">$${data.price.toFixed(2)}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">Change:</span>
-                        <span class="result-value">${data.change}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">Currency:</span>
-                        <span class="result-value">${data.currency}</span>
-                    </div>
-                `, true);
-            } catch (error) {
-                showError(`Error: ${error.message}`);
-            }
-        }
-
-        async function analyze() {
-            const ticker = document.getElementById("ticker").value.toUpperCase();
-            if (!ticker) {
-                showError("Please enter a ticker symbol");
-                return;
-            }
-
-            showLoading("Analyzing stock...");
-            try {
-                const response = await fetch(`${API_BASE}/analyze?ticker=${ticker}`);
-                const data = await response.json();
-
-                if (!response.ok) {
-                    showError(data.detail || "Error analyzing stock");
-                    return;
-                }
-
-                showResult(`
-                    <div class="result-item">
-                        <span class="result-label">Ticker:</span>
-                        <span class="result-value">${data.ticker}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">Price:</span>
-                        <span class="result-value">$${data.price.toFixed(2)}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">Change:</span>
-                        <span class="result-value">${data.change}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">AI Insight:</span>
-                        <span class="result-value">${data.ai_insight}</span>
-                    </div>
-                `, true);
-            } catch (error) {
-                showError(`Error: ${error.message}`);
-            }
-        }
-
-        function showLoading(message) {
-            const resultDiv = document.getElementById("result");
-            resultDiv.className = "result show loading";
-            resultDiv.innerHTML = `<div class="spinner"></div>${message}</div>`;
-        }
-
-        function showResult(html, success = false) {
-            const resultDiv = document.getElementById("result");
-            resultDiv.className = `result show ${success ? 'success' : ''}`;
-            resultDiv.innerHTML = html;
-        }
-
-        function showError(message) {
-            const resultDiv = document.getElementById("result");
-            resultDiv.className = "result show error";
-            resultDiv.innerHTML = `<strong>❌ Error:</strong> ${message}`;
-        }
-
-        // Allow Enter key to fetch price
-        document.getElementById("ticker").addEventListener("keypress", function(e) {
-            if (e.key === "Enter") {
-                getPrice();
+        // Allow Enter key to analyze
+        tickerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                analyzeStock();
             }
         });
+
+        // Clear input focus on load
+        window.addEventListener('load', () => {
+            tickerInput.focus();
+        });
+
+        function analyzeStock() {
+            const ticker = tickerInput.value.toUpperCase().trim();
+
+            if (!ticker) {
+                tickerInput.focus();
+                return;
+            }
+
+            // Hide output and show loading
+            outputCard.classList.add('hidden');
+            loadingContainer.classList.remove('hidden');
+            analyzeBtn.disabled = true;
+
+            // Simulate API delay (2-3 seconds)
+            setTimeout(() => {
+                const stock = stockDatabase[ticker];
+
+                if (!stock) {
+                    // Handle invalid ticker
+                    loadingContainer.classList.add('hidden');
+                    analyzeBtn.disabled = false;
+                    alert(`Stock ticker "${ticker}" not found. Try: AAPL, GOOGL, MSFT, TSLA, AMZN`);
+                    return;
+                }
+
+                // Update output card with stock data
+                displayStockData(stock, ticker);
+
+                // Hide loading and show output
+                loadingContainer.classList.add('hidden');
+                outputCard.classList.remove('hidden');
+                analyzeBtn.disabled = false;
+            }, 2500);
+        }
+
+        function displayStockData(stock, ticker) {
+            document.getElementById('stock-name').textContent = stock.name;
+            document.getElementById('stock-ticker').textContent = ticker;
+            document.getElementById('stock-price').textContent = `$${stock.price.toFixed(2)}`;
+
+            const changeElement = document.getElementById('stock-change');
+            changeElement.textContent = (stock.change > 0 ? '+' : '') + stock.change.toFixed(2) + '%';
+            changeElement.classList.remove('positive', 'negative');
+            changeElement.classList.add(stock.change >= 0 ? 'positive' : 'negative');
+
+            document.getElementById('ai-summary').textContent = stock.summary;
+            document.getElementById('market-cap').textContent = stock.marketCap;
+            document.getElementById('week-high').textContent = stock.weekHigh;
+        }
     </script>
 </body>
 </html>
