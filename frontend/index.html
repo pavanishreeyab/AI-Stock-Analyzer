@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Analysis API</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-price {
+            background-color: #667eea;
+            color: white;
+        }
+
+        .btn-price:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-analyze {
+            background-color: #764ba2;
+            color: white;
+        }
+
+        .btn-analyze:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+        }
+
+        .result {
+            background-color: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 5px;
+            display: none;
+            margin-top: 20px;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s ease-in;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-item {
+            margin-bottom: 12px;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #555;
+            display: inline-block;
+            min-width: 100px;
+        }
+
+        .result-value {
+            color: #333;
+        }
+
+        .error {
+            border-left-color: #e74c3c;
+            background-color: #fadbd8;
+        }
+
+        .success {
+            border-left-color: #27ae60;
+            background-color: #d5f4e6;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📈 Stock Analysis</h1>
+        
+        <div class="form-group">
+            <label for="ticker">Stock Ticker Symbol</label>
+            <input type="text" id="ticker" placeholder="e.g., AAPL, GOOGL, MSFT" maxlength="10">
+        </div>
+
+        <div class="button-group">
+            <button class="btn-price" onclick="getPrice()">Get Price</button>
+            <button class="btn-analyze" onclick="analyze()">AI Analysis</button>
+        </div>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:8000";
+
+        async function getPrice() {
+            const ticker = document.getElementById("ticker").value.toUpperCase();
+            if (!ticker) {
+                showError("Please enter a ticker symbol");
+                return;
+            }
+
+            showLoading("Fetching price...");
+            try {
+                const response = await fetch(`${API_BASE}/price?ticker=${ticker}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    showError(data.detail || "Error fetching price");
+                    return;
+                }
+
+                showResult(`
+                    <div class="result-item">
+                        <span class="result-label">Ticker:</span>
+                        <span class="result-value">${data.ticker}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Price:</span>
+                        <span class="result-value">$${data.price.toFixed(2)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Change:</span>
+                        <span class="result-value">${data.change}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Currency:</span>
+                        <span class="result-value">${data.currency}</span>
+                    </div>
+                `, true);
+            } catch (error) {
+                showError(`Error: ${error.message}`);
+            }
+        }
+
+        async function analyze() {
+            const ticker = document.getElementById("ticker").value.toUpperCase();
+            if (!ticker) {
+                showError("Please enter a ticker symbol");
+                return;
+            }
+
+            showLoading("Analyzing stock...");
+            try {
+                const response = await fetch(`${API_BASE}/analyze?ticker=${ticker}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    showError(data.detail || "Error analyzing stock");
+                    return;
+                }
+
+                showResult(`
+                    <div class="result-item">
+                        <span class="result-label">Ticker:</span>
+                        <span class="result-value">${data.ticker}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Price:</span>
+                        <span class="result-value">$${data.price.toFixed(2)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Change:</span>
+                        <span class="result-value">${data.change}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">AI Insight:</span>
+                        <span class="result-value">${data.ai_insight}</span>
+                    </div>
+                `, true);
+            } catch (error) {
+                showError(`Error: ${error.message}`);
+            }
+        }
+
+        function showLoading(message) {
+            const resultDiv = document.getElementById("result");
+            resultDiv.className = "result show loading";
+            resultDiv.innerHTML = `<div class="spinner"></div>${message}</div>`;
+        }
+
+        function showResult(html, success = false) {
+            const resultDiv = document.getElementById("result");
+            resultDiv.className = `result show ${success ? 'success' : ''}`;
+            resultDiv.innerHTML = html;
+        }
+
+        function showError(message) {
+            const resultDiv = document.getElementById("result");
+            resultDiv.className = "result show error";
+            resultDiv.innerHTML = `<strong>❌ Error:</strong> ${message}`;
+        }
+
+        // Allow Enter key to fetch price
+        document.getElementById("ticker").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                getPrice();
+            }
+        });
+    </script>
+</body>
+</html>
